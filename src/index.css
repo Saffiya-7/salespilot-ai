@@ -1,0 +1,115 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Deep navy text scale */
+  --color-ink-950: #0a1230;
+  --color-ink-900: #111a3d;
+  --color-ink-800: #1e2a52;
+  --color-ink-700: #333f68;
+  --color-ink-600: #4b5680;
+  --color-ink-500: #646e95;
+  --color-ink-400: #8a92b1;
+  --color-ink-300: #b6bcd2;
+  --color-ink-200: #d9dcea;
+  --color-ink-100: #eceef6;
+
+  /* Light lavender surfaces */
+  --color-lavender-25: #fcfbff;
+  --color-lavender-50: #f7f5ff;
+  --color-lavender-100: #f0edfe;
+  --color-lavender-200: #e3defc;
+  --color-lavender-300: #cfc6f8;
+
+  /* Indigo-violet brand */
+  --color-brand-50: #f1efff;
+  --color-brand-100: #e5e1ff;
+  --color-brand-200: #ccc4ff;
+  --color-brand-300: #aa9cff;
+  --color-brand-400: #8b78fa;
+  --color-brand-500: #7058f2;
+  --color-brand-600: #5d43e3;
+  --color-brand-700: #4c34c4;
+  --color-brand-800: #3d2b9d;
+  --color-brand-900: #32277c;
+
+  --shadow-card: 0 1px 2px rgb(17 26 61 / 0.04), 0 6px 24px -12px rgb(17 26 61 / 0.12);
+  --shadow-pop: 0 12px 40px -12px rgb(61 43 157 / 0.35);
+  --shadow-glow: 0 0 0 1px rgb(112 88 242 / 0.12), 0 10px 30px -10px rgb(112 88 242 / 0.45);
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  @keyframes shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-lavender-50 text-ink-900 font-sans;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight text-ink-950;
+  }
+  ::selection {
+    @apply bg-brand-200 text-ink-950;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-brand-500;
+  }
+  button:not(:disabled), [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+  /* Let grid columns shrink instead of being stretched by wide content (tabs, tables). */
+  .grid > * {
+    min-width: 0;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-ink-100 bg-white shadow-card;
+  }
+  .input {
+    @apply block w-full rounded-xl border border-ink-200 bg-white px-3.5 py-2.5 text-sm text-ink-900 placeholder:text-ink-400
+      transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 focus:outline-none disabled:bg-ink-100 disabled:text-ink-500;
+  }
+  .label {
+    @apply mb-1.5 block text-[13px] font-medium text-ink-700;
+  }
+  .skeleton {
+    @apply rounded-lg bg-ink-100;
+    background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.7), transparent);
+    background-size: 400px 100%;
+    background-repeat: no-repeat;
+    animation: var(--animate-shimmer);
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, rgb(112 88 242 / 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(112 88 242 / 0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  .text-gradient {
+    @apply bg-linear-to-r from-brand-600 via-brand-500 to-violet-500 bg-clip-text text-transparent;
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-ink-200) transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

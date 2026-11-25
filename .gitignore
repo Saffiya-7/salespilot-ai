@@ -1,0 +1,32 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+dist-ssr/
+*.local
+
+# environment / secrets — never commit these
+.env
+.env.*
+!.env.example
+
+# Netlify
+.netlify/
+
+# logs & caches
+*.log
+npm-debug.log*
+.vite/
+coverage/
+*.tsbuildinfo
+
+# editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# local tooling
+.claude/
