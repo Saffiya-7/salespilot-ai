@@ -121,10 +121,19 @@ export function toHttpError(err: unknown): HttpError {
   if (status === 429) {
     return new HttpError(429, 'RATE_LIMITED', 'The AI provider is rate-limiting requests right now. Please wait a minute and try again.', 60);
   }
+  if (status === 503 || /high demand|overloaded|UNAVAILABLE/i.test(msg)) {
+    return new HttpError(503, 'AI_UNAVAILABLE', "Google's AI models are overloaded right now (high demand). Please try again in a minute.", 30);
+  }
+  if (status === 504 || /timeout|timed out|DEADLINE_EXCEEDED|deadline expired|aborted/i.test(msg)) {
+    return new HttpError(504, 'AI_UNAVAILABLE', 'The AI took too long to respond. Please try again — it is usually quick on a second try.');
+  }
   return new HttpError(502, 'AI_UNAVAILABLE', 'The AI service is temporarily unavailable. Please try again in a moment.');
 }
 
 const sleepDefault = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Gemini's minimum allowed request deadline. */
+const MIN_ATTEMPT_MS = 10_000;
 
 export interface GenerateJsonOptions<T> {
   system: string;
@@ -139,7 +148,7 @@ export interface GenerateJsonOptions<T> {
   sleep?: (ms: number) => Promise<void>;
   /** overall time budget in ms — kept under Netlify's ~30 s synchronous limit (observed in production) */
   budgetMs?: number;
-  /** per-attempt timeout in ms (default 14 s) so a slow model still leaves time for the fallback */
+  /** per-attempt timeout in ms (default 10 s, Gemini's minimum): the fast model normally answers in 2-5 s, so a longer wait means it is stuck */
   attemptTimeoutMs?: number;
 }
 
@@ -153,10 +162,12 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
   const generate = opts.generate ?? defaultGenerate;
   const sleep = opts.sleep ?? sleepDefault;
   const models = geminiModels();
-  let modelIndex = 0;
+  // Attempt plan: fast primary, primary again (a stuck request usually succeeds on retry), then the fallback model(s).
+  const plan = [models[0], models[0], ...models.slice(1)];
+  let step = 0;
   const retries = opts.retries ?? 2;
-  const deadline = Date.now() + (opts.budgetMs ?? 25_000);
-  const attemptTimeout = opts.attemptTimeoutMs ?? 14_000;
+  const deadline = Date.now() + (opts.budgetMs ?? 24_000);
+  const attemptTimeout = Math.max(MIN_ATTEMPT_MS, opts.attemptTimeoutMs ?? MIN_ATTEMPT_MS);
   let prompt = opts.prompt;
   let transientAttempts = 0;
   let validationAttempts = 0;
@@ -164,8 +175,10 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
 
   for (;;) {
     const remaining = deadline - Date.now();
-    if (remaining < 3_000) break;
-    const model = models[modelIndex];
+    // Gemini rejects request deadlines under 10 s, so don't start an attempt we can't give 10 s.
+    if (remaining < MIN_ATTEMPT_MS + 500) break;
+    const isLastStep = step >= plan.length - 1;
+    const model = plan[Math.min(step, plan.length - 1)];
     try {
       const text = await generate({
         model,
@@ -174,7 +187,8 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
         schema: opts.schema,
         temperature: opts.temperature ?? 0.4,
         maxOutputTokens: opts.maxOutputTokens ?? 4096,
-        timeoutMs: Math.min(attemptTimeout, remaining),
+        // the last step may use all the remaining budget
+        timeoutMs: isLastStep ? remaining - 500 : Math.min(attemptTimeout, remaining - 500),
       });
       let parsed: unknown;
       try {
@@ -198,10 +212,10 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
         prompt = `${opts.prompt}\n\nIMPORTANT: Your previous reply did not match the required JSON schema (${err.message}). Reply again with ONLY valid JSON that matches the schema exactly, with every required field filled.`;
         continue;
       }
-      // Overloaded / slow model: switch to the fallback model straight away.
-      if (isRetryable(err) && modelIndex < models.length - 1) {
-        console.warn(`[gemini] ${model} unavailable (${(err as Error)?.message?.slice(0, 120)}); falling back to ${models[modelIndex + 1]}`);
-        modelIndex++;
+      // Overloaded / stuck model: move to the next step of the plan straight away (no sleep).
+      if (isRetryable(err) && !isLastStep) {
+        console.warn(`[gemini] ${model} failed (${(err as Error)?.message?.slice(0, 120)}); trying ${plan[step + 1]}`);
+        step++;
         continue;
       }
       if (isRetryable(err) && transientAttempts < retries) {

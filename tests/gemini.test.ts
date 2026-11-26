@@ -45,18 +45,19 @@ describe('generateJson', () => {
   });
 
   it('retries transient errors (429/5xx) with backoff, then succeeds', async () => {
-    const gen = scripted(httpErr(503), httpErr(429), '{"answer":"ok"}');
+    // one distinct model → plan of 2 steps (no sleep between them), then backoff retries
+    const gen = scripted(httpErr(503), httpErr(429), httpErr(500), '{"answer":"ok"}');
     const sleep = vi.fn(noSleep);
     const r = await generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep });
     expect(r.data.answer).toBe('ok');
-    expect(gen.calls).toHaveLength(3);
+    expect(gen.calls).toHaveLength(4);
     expect(sleep).toHaveBeenCalledTimes(2);
   });
 
   it('gives up after the retry budget with a safe error', async () => {
     const gen = scripted(httpErr(503));
-    await expect(generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep: noSleep, retries: 2 })).rejects.toMatchObject({ status: 502, code: 'AI_UNAVAILABLE' });
-    expect(gen.calls).toHaveLength(3);
+    await expect(generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep: noSleep, retries: 2 })).rejects.toMatchObject({ status: 503, code: 'AI_UNAVAILABLE' });
+    expect(gen.calls).toHaveLength(4); // 2 plan steps + 2 backoff retries
   });
 
   it('falls back to the second model when the first is overloaded', async () => {
@@ -70,7 +71,7 @@ describe('generateJson', () => {
     const sleep = vi.fn(noSleep);
     const r = await generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep });
     expect(r).toEqual({ data: { answer: 'from backup' }, model: 'backup-model' });
-    expect(used).toEqual(['test-model', 'backup-model']);
+    expect(used).toEqual(['test-model', 'test-model', 'backup-model']);
     expect(sleep).not.toHaveBeenCalled();
   });
 
@@ -81,7 +82,7 @@ describe('generateJson', () => {
       return '{"answer":"ok"}';
     };
     await generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep: noSleep });
-    expect(timeouts[0]).toBeLessThanOrEqual(14_000);
+    expect(timeouts[0]).toBe(10_000); // Gemini's minimum deadline
   });
 
   it('re-asks once when the response does not match the schema', async () => {
@@ -120,6 +121,8 @@ describe('error mapping', () => {
     expect(toHttpError(httpErr(400, 'API key not valid. Please pass a valid API key.')).code).toBe('AI_NOT_CONFIGURED');
     expect(toHttpError(httpErr(404)).message).toMatch(/GEMINI_MODEL/);
     expect(toHttpError(httpErr(429)).status).toBe(429);
+    expect(toHttpError(httpErr(503, 'This model is currently experiencing high demand.')).message).toMatch(/overloaded/);
+    expect(toHttpError(httpErr(504, 'Deadline expired')).message).toMatch(/too long/);
     const generic = toHttpError(new Error('internal stack trace with secrets'));
     expect(generic.message).not.toMatch(/stack|secret/);
   });
