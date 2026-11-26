@@ -4,11 +4,22 @@ import { GoogleGenAI, ThinkingLevel, type GenerateContentResponse, type Schema }
 import type { z } from 'zod';
 import { HttpError, env } from './http';
 
-/** Default model. Override with the GEMINI_MODEL environment variable. */
-export const DEFAULT_MODEL = 'gemini-3.6-flash';
+/**
+ * Default model: fast and cheap, and it answers our structured prompts in a few
+ * seconds — well inside Netlify's synchronous function time limit.
+ * Override with GEMINI_MODEL.
+ */
+export const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
+/** Tried automatically when the primary model is overloaded or slow. Override with GEMINI_FALLBACK_MODEL. */
+export const DEFAULT_FALLBACK_MODEL = 'gemini-3.6-flash';
 
 export function geminiModel(): string {
   return env('GEMINI_MODEL') ?? DEFAULT_MODEL;
+}
+
+/** Primary model first, then the fallback (deduplicated). */
+export function geminiModels(): string[] {
+  return [...new Set([geminiModel(), env('GEMINI_FALLBACK_MODEL') ?? DEFAULT_FALLBACK_MODEL])];
 }
 
 export function isGeminiConfigured(): boolean {
@@ -126,8 +137,10 @@ export interface GenerateJsonOptions<T> {
   retries?: number;
   generate?: RawGenerate;
   sleep?: (ms: number) => Promise<void>;
-  /** overall time budget in ms (Netlify sync functions stop at 60 s) */
+  /** overall time budget in ms — kept under Netlify's ~30 s synchronous limit (observed in production) */
   budgetMs?: number;
+  /** per-attempt timeout in ms (default 14 s) so a slow model still leaves time for the fallback */
+  attemptTimeoutMs?: number;
 }
 
 /**
@@ -139,9 +152,11 @@ export interface GenerateJsonOptions<T> {
 export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ data: T; model: string }> {
   const generate = opts.generate ?? defaultGenerate;
   const sleep = opts.sleep ?? sleepDefault;
-  const model = geminiModel();
+  const models = geminiModels();
+  let modelIndex = 0;
   const retries = opts.retries ?? 2;
-  const deadline = Date.now() + (opts.budgetMs ?? 50_000);
+  const deadline = Date.now() + (opts.budgetMs ?? 25_000);
+  const attemptTimeout = opts.attemptTimeoutMs ?? 14_000;
   let prompt = opts.prompt;
   let transientAttempts = 0;
   let validationAttempts = 0;
@@ -150,6 +165,7 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
   for (;;) {
     const remaining = deadline - Date.now();
     if (remaining < 3_000) break;
+    const model = models[modelIndex];
     try {
       const text = await generate({
         model,
@@ -158,7 +174,7 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
         schema: opts.schema,
         temperature: opts.temperature ?? 0.4,
         maxOutputTokens: opts.maxOutputTokens ?? 4096,
-        timeoutMs: Math.min(40_000, remaining),
+        timeoutMs: Math.min(attemptTimeout, remaining),
       });
       let parsed: unknown;
       try {
@@ -180,6 +196,12 @@ export async function generateJson<T>(opts: GenerateJsonOptions<T>): Promise<{ d
         }
         validationAttempts++;
         prompt = `${opts.prompt}\n\nIMPORTANT: Your previous reply did not match the required JSON schema (${err.message}). Reply again with ONLY valid JSON that matches the schema exactly, with every required field filled.`;
+        continue;
+      }
+      // Overloaded / slow model: switch to the fallback model straight away.
+      if (isRetryable(err) && modelIndex < models.length - 1) {
+        console.warn(`[gemini] ${model} unavailable (${(err as Error)?.message?.slice(0, 120)}); falling back to ${models[modelIndex + 1]}`);
+        modelIndex++;
         continue;
       }
       if (isRetryable(err) && transientAttempts < retries) {

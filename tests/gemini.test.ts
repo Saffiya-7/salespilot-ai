@@ -33,7 +33,10 @@ describe('extractJson', () => {
 });
 
 describe('generateJson', () => {
-  beforeEach(() => vi.stubEnv('GEMINI_MODEL', 'test-model'));
+  beforeEach(() => {
+    vi.stubEnv('GEMINI_MODEL', 'test-model');
+    vi.stubEnv('GEMINI_FALLBACK_MODEL', 'test-model'); // same model: tests below exercise plain retries
+  });
   afterEach(() => vi.unstubAllEnvs());
 
   it('returns validated data and the model name', async () => {
@@ -54,6 +57,31 @@ describe('generateJson', () => {
     const gen = scripted(httpErr(503));
     await expect(generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep: noSleep, retries: 2 })).rejects.toMatchObject({ status: 502, code: 'AI_UNAVAILABLE' });
     expect(gen.calls).toHaveLength(3);
+  });
+
+  it('falls back to the second model when the first is overloaded', async () => {
+    vi.stubEnv('GEMINI_FALLBACK_MODEL', 'backup-model');
+    const used: string[] = [];
+    const gen: RawGenerate = async (req) => {
+      used.push(req.model);
+      if (req.model === 'test-model') throw httpErr(503, 'This model is currently experiencing high demand.');
+      return '{"answer":"from backup"}';
+    };
+    const sleep = vi.fn(noSleep);
+    const r = await generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep });
+    expect(r).toEqual({ data: { answer: 'from backup' }, model: 'backup-model' });
+    expect(used).toEqual(['test-model', 'backup-model']);
+    expect(sleep).not.toHaveBeenCalled();
+  });
+
+  it('caps each attempt so the whole call fits the function time limit', async () => {
+    const timeouts: number[] = [];
+    const gen: RawGenerate = async (req) => {
+      timeouts.push(req.timeoutMs);
+      return '{"answer":"ok"}';
+    };
+    await generateJson({ system: 's', prompt: 'p', schema, validator, generate: gen, sleep: noSleep });
+    expect(timeouts[0]).toBeLessThanOrEqual(14_000);
   });
 
   it('re-asks once when the response does not match the schema', async () => {

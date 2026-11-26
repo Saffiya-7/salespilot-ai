@@ -54,7 +54,7 @@ It is **not** a chatbot wrapper: every AI feature works on the leads stored in *
 ## Tech stack
 
 - **Frontend:** React 19, Vite 8, TypeScript, Tailwind CSS 4, Framer Motion, Lucide icons, Recharts, TanStack Query, React Router.
-- **AI:** Google Gemini via the official `@google/genai` SDK, structured JSON output (response schemas) + Zod validation of every response, retries with back-off. Default model `gemini-3.6-flash` (change with `GEMINI_MODEL`).
+- **AI:** Google Gemini via the official `@google/genai` SDK, structured JSON output (response schemas) + Zod validation of every response, retries with back-off. Default model `gemini-3.5-flash-lite` (fast enough for Netlify's ~30 s function limit), with automatic fallback to `gemini-3.6-flash` when Google reports the first model overloaded (change with `GEMINI_MODEL` / `GEMINI_FALLBACK_MODEL`).
 - **Backend:** Netlify Functions (TypeScript) at `/api/*`.
 - **Database & auth:** Supabase (Postgres + Auth + Row Level Security).
 - **Other:** Papa Parse (CSV), jsPDF + autotable (PDF reports), Vitest (tests).
@@ -201,7 +201,8 @@ git push -u origin main
 | `VITE_SUPABASE_URL` | your Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | your anon / publishable key |
 | `GEMINI_API_KEY` | your Gemini key (mark as **secret** if offered) |
-| `GEMINI_MODEL` *(optional)* | e.g. `gemini-3.6-flash` |
+| `GEMINI_MODEL` *(optional)* | default `gemini-3.5-flash-lite` |
+| `GEMINI_FALLBACK_MODEL` *(optional)* | default `gemini-3.6-flash` |
 
 4. **Deploys → Trigger deploy → Deploy site** (env var changes only apply to new deploys).
 5. Back in **Supabase → Authentication → URL Configuration**, set **Site URL** to your Netlify address (e.g. `https://salespilot-ai.netlify.app`) and add `https://salespilot-ai.netlify.app/**` to **Redirect URLs**.
@@ -265,6 +266,7 @@ The tests (Vitest, `tests/`) cover CSV parsing / column mapping / validation / d
 | "Database tables are missing" | Run the SQL migration (Supabase step 2). |
 | "AI is not configured yet" | Add `GEMINI_API_KEY` (and restart / redeploy). |
 | "The AI model … is not available" | Set `GEMINI_MODEL` to a model your key can use (see ai.google.dev → Models). |
+| AI request fails with "temporarily unavailable" or a 502 | Google sometimes reports a model as overloaded ("high demand"). The app already falls back to a second model; wait a minute and retry, or set `GEMINI_MODEL` to another model. |
 | "Too many AI requests" | You hit the per-user rate limit; wait a minute (or raise the limits). |
 | Sign-up says "check your inbox" but no e-mail arrives | Supabase's test mail sender is rate-limited. Configure SMTP or disable e-mail confirmation while testing. |
 | Password-reset / confirmation link goes to the wrong site | Fix **Site URL** and **Redirect URLs** in Supabase → Authentication → URL Configuration. |
