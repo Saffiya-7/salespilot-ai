@@ -84,7 +84,7 @@ function ScheduleModal({ open, onClose, leads, presetLead, presetDate, presetMes
       open={open}
       onClose={onClose}
       title="Schedule a follow-up"
-      description="SalesPilot reminds you — you stay in control of every message."
+      description="Sumo reminds you — you stay in control of every message."
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>Cancel</Button>

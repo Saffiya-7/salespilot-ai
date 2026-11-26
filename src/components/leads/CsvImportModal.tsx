@@ -164,7 +164,7 @@ export function CsvImportModal({ open, onClose, existing }: { open: boolean; onC
               <ul className="list-disc pl-4">{csv.errors.map((er) => <li key={er}>{er}</li>)}</ul>
             </Alert>
           )}
-          <button onClick={() => downloadText('salespilot-leads-template.csv', CSV_TEMPLATE, 'text/csv;charset=utf-8')} className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline">
+          <button onClick={() => downloadText('sumo-leads-template.csv', CSV_TEMPLATE, 'text/csv;charset=utf-8')} className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:underline">
             <Download className="size-4" /> Download a CSV template
           </button>
         </div>

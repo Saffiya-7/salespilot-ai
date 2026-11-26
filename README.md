@@ -1,8 +1,8 @@
-# SalesPilot AI
+# Sumo
 
 **Find Better Leads. Sell Smarter. Close Faster.**
 
-SalesPilot AI is an AI sales-intelligence and automation app for startups, agencies, B2B sales teams, founders and business-development people. It researches prospects, scores leads with AI, writes personalised cold e-mails and follow-ups, manages your pipeline, and turns your real data into analytics and recommendations.
+Sumo is an AI sales-intelligence and automation app for startups, agencies, B2B sales teams, founders and business-development people. It researches prospects, scores leads with AI, writes personalised cold e-mails and follow-ups, manages your pipeline, and turns your real data into analytics and recommendations.
 
 It is **not** a chatbot wrapper: every AI feature works on the leads stored in *your* database, and the app is careful about honesty:
 
@@ -143,7 +143,7 @@ Open the address it prints (usually http://localhost:5173). `npm run dev` also r
 3. **Get your keys:** **Project Settings → API** (or **Settings → API Keys**):
    - **Project URL** → `VITE_SUPABASE_URL`
    - **anon public** key, or the **publishable** key (`sb_publishable_…`) → `VITE_SUPABASE_ANON_KEY`
-   - ⚠️ Do **not** use the `service_role` / `secret` key anywhere. SalesPilot never needs it (the app refuses to start if it sees one in the browser config).
+   - ⚠️ Do **not** use the `service_role` / `secret` key anywhere. Sumo never needs it (the app refuses to start if it sees one in the browser config).
 4. **Auth URLs:** **Authentication → URL Configuration**:
    - **Site URL:** `http://localhost:5173` for now (change to your Netlify URL after deploying).
    - **Redirect URLs:** add `http://localhost:5173/**` (and later `https://YOUR-SITE.netlify.app/**`). This is needed for sign-up confirmation and password-reset links.
@@ -173,7 +173,7 @@ git add .
 ```
 
 ```powershell
-git commit -m "SalesPilot AI"
+git commit -m "Sumo"
 ```
 
 ```powershell

@@ -271,7 +271,7 @@ export default function Emails() {
                       </Button>
                     )}
                   </div>
-                  <p className="text-[11.5px] text-ink-400">SalesPilot never sends e-mail on its own. "Open in mail app" creates a draft in your own e-mail client for you to review and send.</p>
+                  <p className="text-[11.5px] text-ink-400">Sumo never sends e-mail on its own. "Open in mail app" creates a draft in your own e-mail client for you to review and send.</p>
                 </CardBody>
               </Card>
             </motion.div>

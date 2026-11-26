@@ -149,7 +149,7 @@ export default function SettingsPage() {
                     label="Live web search (optional)"
                     detail={status.data.live_search.configured ? `Provider: ${status.data.live_search.provider}` : 'Not configured — AI research uses only the information you provide.'}
                   />
-                  <StatusRow ok={false} label="E-mail sending" detail="Not configured. SalesPilot never sends e-mail automatically — you copy drafts or open them in your own mail app." />
+                  <StatusRow ok={false} label="E-mail sending" detail="Not configured. Sumo never sends e-mail automatically — you copy drafts or open them in your own mail app." />
                   <div className="flex items-center gap-2 pt-1 text-xs text-ink-500">
                     <ShieldCheck className="size-3.5" /> Rate limit: {status.data.limits.perMinute}/min · {status.data.limits.perDay}/day per user
                   </div>
@@ -181,7 +181,7 @@ export default function SettingsPage() {
             <CardBody className="space-y-3">
               <Alert tone="info">Your records are protected by Row Level Security — only your account can read or change them.</Alert>
               <div className="flex flex-wrap gap-2">
-                <Button variant="secondary" icon={<Download className="size-4" />} disabled={!leads.length} onClick={() => downloadText(`salespilot-all-leads-${dateStamp()}.csv`, leadsToCsv(leads), 'text/csv;charset=utf-8')}>
+                <Button variant="secondary" icon={<Download className="size-4" />} disabled={!leads.length} onClick={() => downloadText(`sumo-all-leads-${dateStamp()}.csv`, leadsToCsv(leads), 'text/csv;charset=utf-8')}>
                   Export all leads ({leads.length})
                 </Button>
                 <Button

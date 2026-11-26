@@ -66,12 +66,12 @@ export default function Analytics() {
     [leadsQ.data, followupsQ.data, activitiesQ.data, emailsQ.data],
   );
 
-  const exportCsv = () => downloadText(`salespilot-report-${dateStamp()}.csv`, analyticsCsv(a), 'text/csv;charset=utf-8');
+  const exportCsv = () => downloadText(`sumo-report-${dateStamp()}.csv`, analyticsCsv(a), 'text/csv;charset=utf-8');
   const exportPdf = async () => {
     setPdfLoading(true);
     try {
       const blob = await analyticsPdf(a, { account: profile?.company_name || profile?.full_name || user?.email || 'Your workspace' });
-      downloadBlob(`salespilot-report-${dateStamp()}.pdf`, blob);
+      downloadBlob(`sumo-report-${dateStamp()}.pdf`, blob);
     } catch (e) {
       toast.error(`Could not create the PDF: ${(e as Error).message}`);
     } finally {

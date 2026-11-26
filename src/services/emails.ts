@@ -26,7 +26,7 @@ export async function deleteEmail(id: string): Promise<void> {
 
 /**
  * The user sent this e-mail themselves (from their own mail client).
- * SalesPilot never sends e-mail on its own; this only records it.
+ * Sumo never sends e-mail on its own; this only records it.
  */
 export async function markEmailSent(email: Pick<GeneratedEmail, 'id' | 'subject'>, lead: Pick<Lead, 'id' | 'contact_name' | 'status'>): Promise<void> {
   const now = new Date().toISOString();

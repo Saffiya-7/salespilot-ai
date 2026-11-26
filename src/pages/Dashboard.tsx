@@ -75,7 +75,7 @@ export default function Dashboard() {
       <PageHeader
         eyebrow={new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
         title={`${greeting()}${firstName ? `, ${firstName}` : ''}`}
-        description={leads.length ? 'Here is where your pipeline stands today — every number comes from your own data.' : 'Welcome to SalesPilot AI. Let’s set up your workspace.'}
+        description={leads.length ? 'Here is where your pipeline stands today — every number comes from your own data.' : 'Welcome to Sumo. Let’s set up your workspace.'}
         actions={
           <>
             <Button variant="secondary" icon={<FileUp className="size-4" />} onClick={() => navigate('/app/leads?import=1')}>Import CSV</Button>

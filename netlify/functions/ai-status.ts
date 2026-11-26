@@ -13,6 +13,6 @@ export default createHandler('ai-status', { method: 'GET', ai: false }, async ()
   live_search: searchProvider(),
   supabase_configured: supabaseConfig() !== null,
   limits: limits(),
-  // SalesPilot never sends e-mail itself; drafts are copied or opened in the user's own mail app.
+  // Sumo never sends e-mail itself; drafts are copied or opened in the user's own mail app.
   email_sending: 'not_configured',
 }));

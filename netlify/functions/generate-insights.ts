@@ -13,7 +13,7 @@ const SYSTEM = `You are a sales operations analyst. From the ACCOUNT DATA metric
 - Every insight must be grounded in specific numbers from the data, quoted exactly. Do not invent benchmarks or industry averages.
 - Mention sample size when it is small (e.g. "only 3 closed deals so far") and avoid strong conclusions from tiny samples.
 - Prioritise: overdue follow-ups, hot leads not yet progressed, stalled deals, best/worst performing industries and sources, scoring coverage.
-- Recommendations must be concrete actions the user can take in SalesPilot this week.
+- Recommendations must be concrete actions the user can take in Sumo this week.
 ${SHARED_RULES}`;
 
 export const EMPTY_INSIGHTS = (): InsightsResult => ({

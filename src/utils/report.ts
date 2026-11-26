@@ -91,7 +91,7 @@ export async function analyticsPdf(a: AnalyticsData, meta: { account: string; ge
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(20);
-  doc.text('SalesPilot AI — Sales Report', 40, 48);
+  doc.text('Sumo — Sales Report', 40, 48);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
   doc.text(`${meta.account} · Generated ${(meta.generatedAt ?? new Date()).toLocaleString()}`, 40, 70);

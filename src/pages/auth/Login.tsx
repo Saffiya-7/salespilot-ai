@@ -33,10 +33,10 @@ export default function Login() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to your SalesPilot workspace."
+      subtitle="Sign in to your Sumo workspace."
       footer={
         <>
-          New to SalesPilot?{' '}
+          New to Sumo?{' '}
           <Link to="/signup" className="font-semibold text-brand-700 hover:underline">
             Create an account
           </Link>

@@ -9,7 +9,7 @@ import { Logo } from './Logo';
 export function FullPageSpinner() {
   return (
     <div className="grid min-h-screen place-items-center bg-lavender-50">
-      <Spinner label="Loading SalesPilot…" />
+      <Spinner label="Loading Sumo…" />
     </div>
   );
 }
@@ -26,7 +26,7 @@ export function SetupRequired() {
           </div>
           <h1 className="mt-5 text-2xl font-bold">Connect your Supabase project</h1>
           <p className="mt-2 text-sm leading-relaxed text-ink-600">
-            SalesPilot stores your leads in your own Supabase database. {supabaseConfigProblem}
+            Sumo stores your leads in your own Supabase database. {supabaseConfigProblem}
           </p>
           <ol className="mt-5 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-700">
             <li>Create a free project at supabase.com.</li>

@@ -176,7 +176,7 @@ export default function Scoring() {
 
       {!isLoading && leads.length === 0 ? (
         <Card>
-          <EmptyState icon={<Gauge className="size-6" />} title="No leads to score yet" description="Add leads first — then SalesPilot can estimate which ones deserve your time." />
+          <EmptyState icon={<Gauge className="size-6" />} title="No leads to score yet" description="Add leads first — then Sumo can estimate which ones deserve your time." />
         </Card>
       ) : (
         <div className="grid gap-6 xl:grid-cols-[360px_1fr]">

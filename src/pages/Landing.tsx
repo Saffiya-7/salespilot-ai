@@ -241,7 +241,7 @@ export default function Landing() {
               Close Faster.
             </motion.h1>
             <motion.p {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.1 }} className="mt-6 max-w-xl text-lg leading-relaxed text-ink-600">
-              SalesPilot AI researches your prospects, scores every lead, writes personalised outreach and keeps your follow-ups on track — so your team spends its time on the deals most likely to close.
+              Sumo researches your prospects, scores every lead, writes personalised outreach and keeps your follow-ups on track — so your team spends its time on the deals most likely to close.
             </motion.p>
             <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }} className="mt-8 flex flex-wrap gap-3">
               <Link to="/signup" className="inline-flex h-12 items-center gap-2 rounded-xl bg-brand-600 px-6 text-[15px] font-semibold text-white shadow-glow transition hover:bg-brand-700">
@@ -334,7 +334,7 @@ export default function Landing() {
           </motion.div>
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {[
-              { n: '01', icon: <Users className="size-5" />, t: 'Add or import leads', d: 'Add leads by hand or import a CSV. Tell SalesPilot what you sell and who you sell to once, in Settings.' },
+              { n: '01', icon: <Users className="size-5" />, t: 'Add or import leads', d: 'Add leads by hand or import a CSV. Tell Sumo what you sell and who you sell to once, in Settings.' },
               { n: '02', icon: <Sparkles className="size-5" />, t: 'Let AI do the groundwork', d: 'Research each company, get a scored priority with reasons, and generate tailored first e-mails and follow-ups.' },
               { n: '03', icon: <Target className="size-5" />, t: 'Work the pipeline', d: 'Move deals through stages, never miss a follow-up, and ask the assistant where to focus next.' },
             ].map((s, i) => (
@@ -357,7 +357,7 @@ export default function Landing() {
           <motion.div {...fadeUp}>
             <div className="text-sm font-semibold tracking-wider text-brand-600 uppercase">Responsible by design</div>
             <h2 className="mt-3 text-3xl font-bold sm:text-[40px] sm:leading-tight">AI you can actually trust in front of a customer</h2>
-            <p className="mt-4 text-lg leading-relaxed text-ink-600">Sales runs on credibility. SalesPilot is explicit about what it knows, what it is guessing, and what it will never do without you.</p>
+            <p className="mt-4 text-lg leading-relaxed text-ink-600">Sales runs on credibility. Sumo is explicit about what it knows, what it is guessing, and what it will never do without you.</p>
           </motion.div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
@@ -387,7 +387,7 @@ export default function Landing() {
           <div className="bg-grid absolute inset-0 opacity-30" />
           <div className="relative">
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Your next best deal is already in your list.</h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-brand-100">Set up your workspace, import your leads and let SalesPilot show you where to focus.</p>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-brand-100">Set up your workspace, import your leads and let Sumo show you where to focus.</p>
             <Link to="/signup" className="mt-8 inline-flex h-12 items-center gap-2 rounded-xl bg-white px-6 text-[15px] font-semibold text-brand-700 transition hover:bg-brand-50">
               Get started free <ArrowRight className="size-4" />
             </Link>
@@ -399,7 +399,7 @@ export default function Landing() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-8 text-sm text-ink-500 sm:flex-row sm:px-8">
           <div className="flex items-center gap-2">
             <LogoMark className="size-6" />
-            <span className="font-semibold text-ink-700">SalesPilot AI</span>
+            <span className="font-semibold text-ink-700">Sumo</span>
             <span>· Find Better Leads. Sell Smarter. Close Faster.</span>
           </div>
           <div className="flex gap-5">

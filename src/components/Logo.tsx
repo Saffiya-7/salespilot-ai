@@ -21,10 +21,10 @@ export function LogoMark({ className }: { className?: string }) {
 
 export function Logo({ to = '/', className, light }: { to?: string; className?: string; light?: boolean }) {
   return (
-    <Link to={to} className={cn('inline-flex items-center gap-2.5', className)} aria-label="SalesPilot AI home">
+    <Link to={to} className={cn('inline-flex items-center gap-2.5', className)} aria-label="Sumo home">
       <LogoMark />
       <span className={cn('font-display text-[17px] font-bold tracking-tight', light ? 'text-white' : 'text-ink-950')}>
-        SalesPilot<span className="text-brand-600"> AI</span>
+        Sumo
       </span>
     </Link>
   );

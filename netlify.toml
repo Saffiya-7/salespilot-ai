@@ -1,4 +1,4 @@
-# SalesPilot AI — Netlify configuration
+# Sumo — Netlify configuration
 [build]
   command = "npm run build"
   publish = "dist"

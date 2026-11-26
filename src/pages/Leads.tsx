@@ -44,7 +44,7 @@ export default function Leads() {
     setParams(next, { replace: true });
   };
 
-  const exportCsv = () => downloadText(`salespilot-leads-${dateStamp()}.csv`, leadsToCsv(visible), 'text/csv;charset=utf-8');
+  const exportCsv = () => downloadText(`sumo-leads-${dateStamp()}.csv`, leadsToCsv(visible), 'text/csv;charset=utf-8');
 
   return (
     <div>
@@ -80,7 +80,7 @@ export default function Leads() {
           <EmptyState
             icon={<Users className="size-6" />}
             title="Add your first leads"
-            description="Start by adding a lead manually or importing a CSV exported from your CRM, spreadsheet or LinkedIn tool. SalesPilot will help you research, score and contact them."
+            description="Start by adding a lead manually or importing a CSV exported from your CRM, spreadsheet or LinkedIn tool. Sumo will help you research, score and contact them."
             action={
               <div className="flex flex-wrap justify-center gap-2">
                 <Button icon={<Plus className="size-4" />} onClick={() => setAdding(true)}>Add a lead</Button>
